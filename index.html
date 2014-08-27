@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='bootstrap.css' rel='stylesheet' />
+  <link href='application.css' rel='stylesheet' />
+  <script src='jquery.js'></script>
+  <script src='accounting.js'></script>
+  <script src='markdown.js'></script>
+  <script src='handlebars.js'></script>
+  <script src='ember.js'></script>
+  <script src='ember-data.js'></script>
+  <script src='app.js'></script>
+</head>
+<body>
+  <script type='text/x-handlebars' data-template-name='application'>
+    <div class='navbar navbar-default'>
+      <div class='container'>
+        {{#link-to 'index' class='navbar-brand'}}<img src='images/logo.png' alt='logo' height='34' />{{/link-to}}
+        <ul class='nav navbar-nav navbar-right'>
+          {{#link-to 'index' tagName='li'}}Home{{/link-to}}
+          {{#link-to 'products' tagName='li'}}Products{{/link-to}}
+          {{#link-to 'contacts' tagName='li'}}Contacts{{/link-to}}
+        </ul>
+      </div>
+    </div>
+    <div class='container'>
+      {{outlet}}
+    </div>
+    <footer class='container'>
+      <hr />
+      <p class='pull-left'>&copy; 2014 The Fine Art Station</p>
+      <p class='pull-right'>{{#link-to 'credits'}}Credits{{/link-to}}</p>
+    </footer>
+  </script>
+  <script type='text/x-handlebars' data-template-name='index'>
+    <div class='jumbotron'>
+      <h1>Welcome to The Fine Art Station!</h1>
+      <p class='tagline'>
+        <p style='text-align: center; color: #B8B8B8;font-family: Georgia'>A place to find everything to decorate your home</p>
+      </p>
+      <p>
+        {{#link-to 'products' class='btn btn-primary btn-lg'}}
+          Browse All {{productsCount}} Items &raquo;
+        {{/link-to}}
+      </p>
+    </div>
+    <div class='row'>
+      {{#each onSale}}
+        {{product-details product=this classNames='col-sm-4'}}
+      {{/each}}
+    </div>
+    <p class='pull-right text-muted'>Rendered on {{time}}</p>
+  </script>
+  <script type='text/x-handlebars' data-template-name='contacts/index'>
+    <div class='row'>
+      <img {{bind-attr src='avatar'}} alt='Avatar' class='img-thumbnail col-sm-4'/>
+      <div class='col-sm-8'>
+        <h1>About Our Online Store</h1>
+        <p>Contact {{contactName}} for more info!</p>
+        <p>Tel: +1(xxx)xxx-xxxx</p>
+        <p>E-mail: xxx@xxx.xxx</p>
+        <p>Current Status: {{open}}. </br>(Open hours: 24 hrs from Monday to Saturday)</p>
+      </div>
+    </div>
+  </script>
+  <script type='text/x-handlebars' data-template-name='credits'>
+    <h1>Thanks for the Help!</h1>
+    <p>This site would not be possible without the hardworking Ember Core Team and code school team!</p>
+  </script>
+  <script type='text/x-handlebars' data-template-name='products'>
+    <div class='row'>
+      <div class='col-sm-3'>
+        <div class='list-group'>
+        {{#link-to 'products.deals' classNames='list-group-item'}}Deals{{/link-to}}
+        {{#link-to 'products.onsale' classNames='list-group-item'}}On Sale{{/link-to}}
+      </div>
+        <div class='list-group'>
+          {{#each}}
+            {{#link-to 'product' this classNames='list-group-item'}}
+              {{title}}
+            {{/link-to}}
+          {{/each}}
+        </div>
+      </div>
+      <div class='col-sm-9'>
+        {{outlet}}
+      </div>
+    </div>
+  </script>
+  <script type='text/x-handlebars' data-template-name='product'>
+    <div class='row'>
+      <div class='col-sm-7'>
+        <h2>{{title}}</h2>
+        <h3 class='text-success'>${{price}}</h3>
+        <p class='text-muted'>{{description}}</p>
+        <p class='text-muted'>This Product has a {{rating}} star rating!</p>
+        <p>Finely crafted by {{#link-to 'contact' crafter}}{{crafter.name}}{{/link-to}}.</p>
+        {{render 'reviews' reviews}}
+        {{#if isNotReviewed}}
+          <div class='new-review'>
+            <h3>Review {{title}}</h3>
+            {{#if review.text}}
+              <p class='text-muted'>{{review.text}}</p>
+            {{/if}}
+
+            {{textarea valueBinding='review.text'}}
+            {{view Ember.Select content=ratings value=review.rating}}
+            <button {{action 'createReview'}} class='btn-primary'>Review</button>
+          </div>
+        {{/if}}
+      </div>
+      <div class='col-sm-5'>
+        <img {{bind-attr src='image'}} class='img-thumbnail img-rounded'/>
+      </div>
+    </div>
+    {{contact-details contact=crafter className='row'}}
+  </script>
+  <script type='text/x-handlebars' data-template-name='products/index'>
+    <h1>Products!</h1>
+    <ul class='list-unstyled'>
+      {{#each}}
+        {{product-details product=this classNames='row' tagName='li'}}
+      {{/each}}
+    </ul>
+  </script>
+  <script type='text/x-handlebars' data-template-name='contacts'>
+    <div class='row'>
+      <div class='col-sm-9'>
+        {{outlet}}
+      </div>
+      <div class='col-sm-3'>
+        <div class='list-group'>
+          {{#each}}
+            {{#link-to 'contact' this classNames='list-group-item'}}
+              {{name}}
+            {{/link-to}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </script>
+  <script type='text/x-handlebars' data-template-name='contact'>
+    <div class='row'>
+      <div class='col-sm-5'>
+        <img {{bind-attr src='avatar' alt='name'}} class='img-thumbnail img-rounded'/>
+      </div>
+      <div class='col-sm-7'>
+        <h2>{{name}}</h2>
+        <p>{{about}}</p>
+        {{render 'contact/products' products}}
+      </div>
+    </div>
+  </script>
+  <script type='text/x-handlebars' data-template-name='contact/products'>
+    <h3>Products here3</h3>
+    <ul>
+      {{#each}}
+        <li>{{#link-to 'product' this}}{{title}}{{/link-to}}</li>
+      {{/each}}
+    </ul>
+  </script>
+  <script type='text/x-handlebars' data-template-name='products/onsale'>
+    <h1>Products On Sale</h1>
+    <ul class='list-unstyled'>
+      {{#each}}
+        {{product-details product=this classNames='row' tagName='li'}}
+      {{/each}}
+    </ul>
+  </script>
+  <script type='text/x-handlebars' data-template-name='products/deals'>
+    <h1>Todays Product Deals!</h1>
+    <ul class='list-unstyled'>
+      {{#each}}
+        {{product-details product=this classNames='row' tagName='li'}}
+      {{/each}}
+    </ul>
+  </script>
+  <script type='text/x-handlebars' data-template-name='components/product-details'>
+    <img {{bind-attr src='product.image'}} class='img-thumbnail img-product col-sm-5' />
+    <div class='col-sm-7'>
+      <h2>{{product.title}}</h2>
+      <p class='product-description'>{{product.description}}</p>
+      <p>{{#link-to 'product' product class='btn btn-success'}}
+        Buy for ${{product.price}}{{/link-to}}
+      </p>
+      {{#if hasReviews}}
+        <p class='text-muted'>Read all reviews ({{reviewsCount}}).</p>
+      {{/if}}
+
+    </div>
+  </script>
+  <script type='text/x-handlebars' data-template-name='components/contact-details'>
+    <div class='col-sm-9'>
+      <h2>About {{contact.name}}</h2>
+      <p>{{contact.about}}</p>
+      {{#if isProductive}}
+        <p class='text-muted'>Responsible for {{productsCount}} amazing products!</p>
+      {{/if}}
+    </div>
+    <div class='col-sm-3'>
+      <img {{bind-attr src='contact.avatar' alt='contact.name'}} class='img-thumbnail img-rounded'/>
+    </div>
+  </script>
+  <script type='text/x-handlebars' data-template-name='reviews'>
+    <h3>Reviews</h3>
+    <ul>
+      {{#each}}
+        {{#view 'App.ReviewView' tagName='li' length=text.length}}
+          <div class='content'>{{text}}</div>
+          <span class='expand text-success'>
+            Read {{#if view.isExpanded}}Less{{else}}More{{/if}}
+          </span>
+        {{/view}}
+      {{else}}
+        <li><p class='text-muted'><em>No reviews yet. Be the first to write one!</em></p></li>
+      {{/each}}
+    </ul>
+  </script>
+</body>
+</html>
